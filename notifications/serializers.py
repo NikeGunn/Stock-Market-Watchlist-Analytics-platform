@@ -191,6 +191,7 @@ class CreatePriceAlertSerializer(serializers.Serializer):
     
     stock_symbol = serializers.CharField(
         required=True,
+        write_only=True,
         help_text='Stock symbol (e.g., AAPL)'
     )
     condition_type = serializers.ChoiceField(
@@ -203,6 +204,12 @@ class CreatePriceAlertSerializer(serializers.Serializer):
         required=True
     )
     one_time = serializers.BooleanField(default=True)
+    
+    # Read-only fields for response
+    id = serializers.UUIDField(read_only=True)
+    stock = serializers.CharField(source='stock.symbol', read_only=True)
+    is_active = serializers.BooleanField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
     
     def validate_stock_symbol(self, value):
         """Validate stock exists."""
