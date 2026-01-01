@@ -1,0 +1,719 @@
+{
+	"info": {
+		"name": "Stock Market Watchlist API",
+		"description": "Complete API collection for testing Stock Market Watchlist & Analytics platform",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser@example.com\",\n    \"password\": \"SecurePass123!\",\n    \"password2\": \"SecurePass123!\",\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts/users/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts", "users", ""]
+						},
+						"description": "Register a new user account"
+					}
+				},
+				{
+					"name": "Login - Get JWT Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"access_token\", jsonData.access);",
+									"pm.environment.set(\"refresh_token\", jsonData.refresh);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response has access token\", function () {",
+									"    pm.expect(jsonData.access).to.exist;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"standard@test.com\",\n    \"password\": \"test123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/token/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "token", ""]
+						},
+						"description": "Login with email and password to get JWT access and refresh tokens"
+					}
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.environment.set(\"access_token\", jsonData.access);",
+									"",
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refresh\": \"{{refresh_token}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/auth/token/refresh/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "auth", "token", "refresh", ""]
+						},
+						"description": "Get a new access token using refresh token"
+					}
+				}
+			],
+			"description": "User registration, login, and token management"
+		},
+		{
+			"name": "User Management",
+			"item": [
+				{
+					"name": "Get My Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts/users/me/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts", "users", "me", ""]
+						},
+						"description": "Get current authenticated user's profile"
+					}
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"timezone\": \"America/New_York\",\n    \"preferred_currency\": \"USD\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts/users/update_profile/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts", "users", "update_profile", ""]
+						},
+						"description": "Update user profile settings"
+					}
+				},
+				{
+					"name": "Change Password",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"old_password\": \"test123\",\n    \"new_password\": \"NewSecurePass456!\",\n    \"new_password2\": \"NewSecurePass456!\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/accounts/users/change_password/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "accounts", "users", "change_password", ""]
+						},
+						"description": "Change user password"
+					}
+				}
+			]
+		},
+		{
+			"name": "Stocks",
+			"item": [
+				{
+					"name": "List All Stocks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/stocks/stocks/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "stocks", "stocks", ""]
+						},
+						"description": "Get list of all available stocks"
+					}
+				},
+				{
+					"name": "Search Stocks",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/stocks/stocks/search/?query=AAPL",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "stocks", "stocks", "search", ""],
+							"query": [
+								{
+									"key": "query",
+									"value": "AAPL"
+								}
+							]
+						},
+						"description": "Search stocks by symbol or name"
+					}
+				},
+				{
+					"name": "Get Stock Detail",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.environment.set(\"stock_id\", jsonData.data.id);",
+									"    pm.environment.set(\"stock_symbol\", jsonData.data.symbol);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/stocks/stocks/{{stock_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "stocks", "stocks", "{{stock_id}}", ""]
+						},
+						"description": "Get detailed information about a specific stock"
+					}
+				},
+				{
+					"name": "Create Stock (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"symbol\": \"NVDA\",\n    \"name\": \"NVIDIA Corporation\",\n    \"exchange\": \"NASDAQ\",\n    \"currency\": \"USD\",\n    \"sector\": \"Technology\",\n    \"industry\": \"Semiconductors\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/stocks/stocks/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "stocks", "stocks", ""]
+						},
+						"description": "Create a new stock (Admin only)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Pricing",
+			"item": [
+				{
+					"name": "Get Latest Price",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/pricing/prices/latest/?symbol=AAPL",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "pricing", "prices", "latest", ""],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "AAPL"
+								}
+							]
+						},
+						"description": "Get latest price for a stock (cached)"
+					}
+				},
+				{
+					"name": "Get Historical Prices",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbol\": \"AAPL\",\n    \"start_date\": \"2024-12-01T00:00:00Z\",\n    \"end_date\": \"2024-12-31T23:59:59Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/pricing/prices/historical/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "pricing", "prices", "historical", ""]
+						},
+						"description": "Get historical price data (Premium users only)"
+					}
+				},
+				{
+					"name": "Get Price Statistics",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbol\": \"AAPL\",\n    \"start_date\": \"2024-12-01T00:00:00Z\",\n    \"end_date\": \"2024-12-31T23:59:59Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/pricing/prices/statistics/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "pricing", "prices", "statistics", ""]
+						},
+						"description": "Get statistical analysis (avg, min, max, volatility)"
+					}
+				}
+			]
+		},
+		{
+			"name": "Watchlists",
+			"item": [
+				{
+					"name": "List My Watchlists",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", ""]
+						},
+						"description": "Get all watchlists for current user"
+					}
+				},
+				{
+					"name": "Create Watchlist",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.environment.set(\"watchlist_id\", jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"My Tech Stocks\",\n    \"description\": \"Technology sector watchlist\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", ""]
+						},
+						"description": "Create a new watchlist"
+					}
+				},
+				{
+					"name": "Get Watchlist Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/{{watchlist_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", "{{watchlist_id}}", ""]
+						},
+						"description": "Get watchlist with all stocks"
+					}
+				},
+				{
+					"name": "Add Stock to Watchlist",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbol\": \"AAPL\",\n    \"notes\": \"Apple - strong buy\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/{{watchlist_id}}/add_stock/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", "{{watchlist_id}}", "add_stock", ""]
+						},
+						"description": "Add a stock to watchlist"
+					}
+				},
+				{
+					"name": "Bulk Add Stocks",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbols\": [\"AAPL\", \"GOOGL\", \"MSFT\", \"TSLA\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/{{watchlist_id}}/bulk_add/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", "{{watchlist_id}}", "bulk_add", ""]
+						},
+						"description": "Add multiple stocks at once"
+					}
+				},
+				{
+					"name": "Remove Stock from Watchlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/{{watchlist_id}}/remove_stock/?symbol=TSLA",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", "{{watchlist_id}}", "remove_stock", ""],
+							"query": [
+								{
+									"key": "symbol",
+									"value": "TSLA"
+								}
+							]
+						},
+						"description": "Remove a stock from watchlist"
+					}
+				},
+				{
+					"name": "Delete Watchlist",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/watchlists/watchlists/{{watchlist_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "watchlists", "watchlists", "{{watchlist_id}}", ""]
+						},
+						"description": "Delete a watchlist"
+					}
+				}
+			]
+		},
+		{
+			"name": "Alerts & Notifications",
+			"item": [
+				{
+					"name": "List My Alerts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", ""]
+						},
+						"description": "Get all price alerts for current user"
+					}
+				},
+				{
+					"name": "Create Price Alert - Above",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.data && jsonData.data.id) {",
+									"    pm.environment.set(\"alert_id\", jsonData.data.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbol\": \"AAPL\",\n    \"condition_type\": \"PRICE_ABOVE\",\n    \"threshold_value\": 200.00,\n    \"one_time\": true\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", ""]
+						},
+						"description": "Create alert when price goes above threshold"
+					}
+				},
+				{
+					"name": "Create Price Alert - Below",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbol\": \"AAPL\",\n    \"condition_type\": \"PRICE_BELOW\",\n    \"threshold_value\": 150.00,\n    \"one_time\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", ""]
+						},
+						"description": "Create recurring alert when price goes below threshold"
+					}
+				},
+				{
+					"name": "Create Percent Change Alert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"stock_symbol\": \"TSLA\",\n    \"condition_type\": \"PERCENT_CHANGE\",\n    \"threshold_value\": 5.0,\n    \"one_time\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", ""]
+						},
+						"description": "Alert when price changes by percentage"
+					}
+				},
+				{
+					"name": "Activate Alert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/{{alert_id}}/activate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", "{{alert_id}}", "activate", ""]
+						},
+						"description": "Activate a deactivated alert"
+					}
+				},
+				{
+					"name": "Deactivate Alert",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/{{alert_id}}/deactivate/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", "{{alert_id}}", "deactivate", ""]
+						},
+						"description": "Temporarily deactivate an alert"
+					}
+				},
+				{
+					"name": "Delete Alert",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/alerts/{{alert_id}}/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "alerts", "{{alert_id}}", ""]
+						},
+						"description": "Delete a price alert"
+					}
+				},
+				{
+					"name": "List All Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/notifications/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "notifications", ""]
+						},
+						"description": "Get all notifications"
+					}
+				},
+				{
+					"name": "Get Unread Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/notifications/unread/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "notifications", "unread", ""]
+						},
+						"description": "Get only unread notifications"
+					}
+				},
+				{
+					"name": "Mark as Read",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"notification_ids\": [\"uuid-here\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/v1/notifications/notifications/mark_read/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "notifications", "notifications", "mark_read", ""]
+						},
+						"description": "Mark notifications as read"
+					}
+				}
+			]
+		},
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "System Health",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/v1/health/",
+							"host": ["{{base_url}}"],
+							"path": ["api", "v1", "health", ""]
+						},
+						"description": "Check system health (database, cache, celery)"
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000"
+		}
+	]
+}
