@@ -33,6 +33,7 @@ class StockPriceViewSet(viewsets.ModelViewSet):
     serializer_class = StockPriceSerializer
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     filterset_fields = ['stock', 'source']
+    ordering = ['-timestamp']  # Required for cursor pagination
     
     def get_queryset(self):
         """

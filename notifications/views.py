@@ -21,6 +21,7 @@ class PriceAlertViewSet(viewsets.ModelViewSet):
     
     serializer_class = PriceAlertSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    ordering = ['-created_at']  # Required for cursor pagination
     
     def get_queryset(self):
         """Users only see their own alerts."""
@@ -65,6 +66,7 @@ class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
     
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    ordering = ['-created_at']  # Required for cursor pagination
     
     def get_queryset(self):
         """Users only see their own notifications."""

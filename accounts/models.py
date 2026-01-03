@@ -15,7 +15,10 @@ This follows the Single Responsibility Principle.
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 import uuid
+import secrets
+import hashlib
 
 
 class UserManager(BaseUserManager):
@@ -182,3 +185,117 @@ class Profile(models.Model):
             self.max_watchlists = 999
         
         super().save(*args, **kwargs)
+
+
+class APIKeyManager(models.Manager):
+    """
+    Custom manager for APIKey model.
+    """
+    
+    def create_key(self, user, name):
+        """
+        Create a new API key for a user.
+        
+        Returns:
+            tuple: (api_key_instance, raw_key)
+            The raw_key should be shown to user only once!
+        """
+        # Generate secure random key
+        raw_key = secrets.token_urlsafe(32)  # 32 bytes = 256 bits
+        
+        # Hash the key before storing (like passwords)
+        hashed_key = hashlib.sha256(raw_key.encode()).hexdigest()
+        
+        api_key = self.create(
+            user=user,
+            name=name,
+            key=hashed_key
+        )
+        
+        return (api_key, raw_key)
+    
+    def active_keys(self):
+        """Return only active API keys."""
+        return self.filter(is_active=True)
+
+
+class APIKey(models.Model):
+    """
+    API Key model for internal service authentication.
+    
+    WHY API KEYS?
+    - Internal services need to authenticate without user credentials
+    - Long-lived tokens for automated processes
+    - Can be revoked/rotated without changing passwords
+    
+    SECURITY:
+    - Keys are hashed (SHA-256) before storage
+    - Keys can be revoked individually
+    - Track usage (last_used_at) for auditing
+    """
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='api_keys',
+        help_text='Service account or user this key belongs to'
+    )
+    
+    name = models.CharField(
+        max_length=100,
+        help_text='Descriptive name for this key (e.g., "Price Fetcher Service")'
+    )
+    key = models.CharField(
+        max_length=255,
+        unique=True,
+        db_index=True,
+        help_text='Hashed API key (SHA-256)'
+    )
+    
+    is_active = models.BooleanField(default=True)
+    
+    # Usage tracking
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+    expires_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='Optional expiration date'
+    )
+    
+    objects = APIKeyManager()
+    
+    class Meta:
+        db_table = 'api_keys'
+        verbose_name = 'API Key'
+        verbose_name_plural = 'API Keys'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['key']),
+            models.Index(fields=['user', 'is_active']),
+        ]
+    
+    def __str__(self):
+        return f'{self.user.email} - {self.name}'
+    
+    def record_usage(self):
+        """Update last_used_at timestamp."""
+        self.last_used_at = timezone.now()
+        self.save(update_fields=['last_used_at'])
+    
+    def is_valid(self):
+        """Check if key is active and not expired."""
+        if not self.is_active:
+            return False
+        
+        if self.expires_at and self.expires_at < timezone.now():
+            return False
+        
+        return True
+    
+    def revoke(self):
+        """Revoke this API key."""
+        self.is_active = False
+        self.save(update_fields=['is_active'])
+

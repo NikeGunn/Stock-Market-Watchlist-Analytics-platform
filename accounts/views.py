@@ -44,6 +44,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.filter(is_active=True)
     serializer_class = UserSerializer
     permission_classes = [IsOwnerOrAdmin]
+    ordering = ['id']  # Required for cursor pagination
     
     def get_serializer_class(self):
         """

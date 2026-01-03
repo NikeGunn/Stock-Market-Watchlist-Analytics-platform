@@ -20,6 +20,7 @@ class WatchlistViewSet(viewsets.ModelViewSet):
     
     serializer_class = WatchlistSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    ordering = ['-created_at']  # Required for cursor pagination
     
     def get_queryset(self):
         """Users only see their own watchlists."""
@@ -122,6 +123,7 @@ class WatchlistItemViewSet(viewsets.ModelViewSet):
     
     serializer_class = WatchlistItemSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
+    ordering = ['-created_at']  # Required for cursor pagination
     
     def get_queryset(self):
         """Users only see their own watchlist items."""

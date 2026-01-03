@@ -206,6 +206,30 @@ class Notification(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     
+    objects = models.Manager()  # Default manager
+    
+    class NotificationQuerySet(models.QuerySet):
+        """Custom queryset for Notification."""
+        
+        def unread(self):
+            """Get unread notifications."""
+            return self.filter(read_at__isnull=True)
+        
+        def by_user(self, user):
+            """Get notifications for a specific user."""
+            return self.filter(user=user)
+        
+        def pending(self):
+            """Get pending notifications."""
+            return self.filter(status='PENDING')
+        
+        def sent(self):
+            """Get successfully sent notifications."""
+            return self.filter(status='SENT')
+    
+    # Override default manager with custom queryset
+    objects = NotificationQuerySet.as_manager()
+    
     class Meta:
         db_table = 'notifications'
         verbose_name = 'Notification'

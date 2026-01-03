@@ -38,6 +38,7 @@ class StockViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminOrReadOnly]
     search_fields = ['symbol', 'name']
     filterset_fields = ['exchange', 'currency', 'sector']
+    ordering = ['symbol']  # Required for cursor pagination
     
     def get_serializer_class(self):
         """Use lightweight serializer for list action."""
