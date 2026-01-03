@@ -140,7 +140,7 @@ class TestUserAPI:
             'last_name': 'Doe'
         }
         
-        response = api_client.post('/api/v1/accounts/users/', data)
+        response = api_client.post('/api/v1/accounts/users/', data, format='json')
         
         assert response.status_code == status.HTTP_201_CREATED
         assert 'data' in response.data
@@ -159,7 +159,7 @@ class TestUserAPI:
             'password2': 'different456'
         }
         
-        response = api_client.post('/api/v1/accounts/users/', data)
+        response = api_client.post('/api/v1/accounts/users/', data, format='json')
         
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert 'errors' in response.data
@@ -191,7 +191,7 @@ class TestUserAPI:
             'preferred_currency': 'EUR'
         }
         
-        response = api_client.put('/api/v1/accounts/users/update_profile/', data)
+        response = api_client.put('/api/v1/accounts/users/update_profile/', data, format='json')
         
         assert response.status_code == status.HTTP_200_OK
         
@@ -211,7 +211,7 @@ class TestUserAPI:
             'new_password2': 'newpassword456'
         }
         
-        response = api_client.post('/api/v1/accounts/users/change_password/', data)
+        response = api_client.post('/api/v1/accounts/users/change_password/', data, format='json')
         
         assert response.status_code == status.HTTP_200_OK
         
@@ -230,7 +230,7 @@ class TestUserAPI:
             'new_password2': 'newpassword456'
         }
         
-        response = api_client.post('/api/v1/accounts/users/change_password/', data)
+        response = api_client.post('/api/v1/accounts/users/change_password/', data, format='json')
         
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
