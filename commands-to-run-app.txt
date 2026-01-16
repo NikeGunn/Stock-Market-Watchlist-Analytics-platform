@@ -1,0 +1,38 @@
+Start the system (5 min):
+
+docker-compose up -d
+docker-compose logs -f  # Watch it start
+
+Create test data (2 min):
+docker-compose exec web python manage.py createsuperuser
+docker-compose exec web python manage.py create_sample_data
+
+
+docker-compose exec web pytest accounts/tests.py -q
+
+docker-compose exec web pytest accounts/tests.py::TestUserAPI -v
+
+
+# Run ALL tests
+docker-compose exec web pytest
+
+# Run tests in one file
+docker-compose exec web pytest accounts/tests.py
+
+# Run one specific test
+docker-compose exec web pytest accounts/tests.py::TestUserAPI::test_register_user
+
+# Run with verbose output (shows test names)
+docker-compose exec web pytest -v
+
+# Run quietly (minimal output)
+docker-compose exec web pytest -q
+
+# Stop after first failure
+docker-compose exec web pytest -x
+
+# Show print statements (useful for debugging)
+docker-compose exec web pytest -s
+
+# Run tests matching a pattern
+docker-compose exec web pytest -k "register"  # runs test_register_user, test_register_admin, etc.
